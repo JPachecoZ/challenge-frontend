@@ -19,6 +19,7 @@ export default function LoginPage(){
         event.preventDefault();
         setError(false)
         const user = await login(email, password);
+
         if (user){
             handleUser(user);
             router.push('/');

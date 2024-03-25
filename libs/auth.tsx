@@ -10,6 +10,7 @@ export function AuthProvider({ children } : {children : React.ReactNode}){
     const [user, setUser] = useState(getUser);
 
     function handleUser(newUser: User | null){
+        console.log('handling user in the context...')
         setUser(newUser)
     }
 

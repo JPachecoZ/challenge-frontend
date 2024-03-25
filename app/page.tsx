@@ -2,36 +2,20 @@
 
 import { useState } from "react";
 import { redirect } from "next/navigation";
-import { useQuery, gql, useMutation } from '@apollo/client';
-import { TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper } from "@mui/material";
+import { useQuery, useMutation } from '@apollo/client';
+import { TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper, Button } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import Delete from "@mui/icons-material/Delete";
 
 import { useAuth } from "@/libs/auth";
 import { User } from "@/models/user.model";
-import EditIcon from "@mui/icons-material/Edit";
-import Delete from "@mui/icons-material/Delete";
 import UserDialog from '../components/UserDialog/index';
-
-const GET_USERS = gql`
-  query GetUsers {
-    users {
-      id
-      name
-      email
-    }
-  }
-`
-
-const DELETE_USER = gql`
-  mutation deleteUser($id: ID!) {
-    deleteUser(id: $id) {
-      id
-    }
-  }
-`
+import { GET_USERS, DELETE_USER } from "@/libs/graphql";
 
 export default function Home() {
   const { loading, error, data } = useQuery(GET_USERS);
   const [open, setOpen] = useState(false);
+  const [dialogType, setDialogType] = useState<'Edit' | 'Create'>('Create');
   const [userToEdit, setUserToEdit] = useState<User | null>(null);
   const [deleteUser, {}] = useMutation(DELETE_USER, {refetchQueries: [{query: GET_USERS}]})
   let { user, handleUser } = useAuth();
@@ -45,10 +29,15 @@ export default function Home() {
 
   const handleOpenEditUserDialog = (user: User) => {
     setUserToEdit(user)
+    setDialogType('Edit')
     setOpen(true)
   }
 
   const handleDialogOpen = (open: boolean) => {
+    if(!open) {
+      setUserToEdit(null)
+      setDialogType('Create')
+    }
     setOpen(open)
   }
 
@@ -57,10 +46,11 @@ export default function Home() {
     redirect('/login')
   }
 
-  if(user){
+  if(user && user.email){
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-24">
           <h1 className="text-4xl font-bold">Hello, {user.name}!</h1>
+            <Button variant="outlined" onClick={() => handleDialogOpen(true)}>Create User</Button>
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
@@ -88,7 +78,7 @@ export default function Home() {
                 </TableBody>
               </Table>
             </TableContainer>
-            <UserDialog user={userToEdit} open={open} onHandleEditUser={handleEditUser} onHandleDialogOpen={handleDialogOpen}/>
+            <UserDialog user={userToEdit} open={open} onHandleEditUser={handleEditUser} dialogType={dialogType}onHandleDialogOpen={handleDialogOpen}/>
           <button onClick={handleLogout} className="button">Logout</button>
         </main>
     )

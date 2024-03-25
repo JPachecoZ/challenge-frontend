@@ -36,13 +36,13 @@ export default function RootLayout({
 
   return (
     <ApolloProvider client={client}>
-        <AuthProvider>
-          <html lang="en">
-              <body className={inter.className}>
-                {children}
-              </body>
-          </html>
-        </AuthProvider>
-      </ApolloProvider>
+      <AuthProvider>
+        <html lang="en">
+            <body className={inter.className}>
+              {children}
+            </body>
+        </html>
+      </AuthProvider>
+    </ApolloProvider>
   );
 }

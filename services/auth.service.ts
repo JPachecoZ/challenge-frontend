@@ -30,10 +30,11 @@ export function logout(){
 }
 
 function getUserFromToken(token:string){
-    const claims: JwtPayload & {email: string} = jwtDecode(token)
+    const claims: JwtPayload & {email: string, name?: string} = jwtDecode(token)
     return {
         id: claims.sub!,
         email: claims.email,
+        name: claims.name
     }
 }
 

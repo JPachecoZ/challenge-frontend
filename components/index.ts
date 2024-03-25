@@ -1,1 +1,1 @@
-export * from './DeleteUserIcon';
+export * from './UserDialog';

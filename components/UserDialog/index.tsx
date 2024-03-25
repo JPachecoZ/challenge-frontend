@@ -1,43 +1,31 @@
-import { User } from "@/models/user.model";
-import { gql, useMutation } from "@apollo/client";
+'use client';
+
+import { useMutation } from "@apollo/client";
 import { Box, Button, Dialog, DialogContent, DialogTitle, TextField } from "@mui/material";
-import { useState } from "react";
+import { BaseSyntheticEvent } from "react";
 
-const EDIT_USER = gql`
-    mutation updateUser($id: ID!, $name: String, $email: String!) {
-      updateUser(id: $id, name: $name, email: $email) {
-        id
-        name
-        email
-      }
-    }
-  `
+import { User } from "@/models/user.model";
+import { CREATE_USER, EDIT_USER } from "@/libs/graphql/mutations";
+import { GET_USERS } from "@/libs/graphql/queries";
 
-const CREATE_USER = gql`
-    mutation createUser($name: String, $email: String!) {
-      createUser(name: $name, email: $email) {
-        name
-        email
-      }
-    }
-  `
-
-export default function UserDialog({open, onHandleDialogOpen, onHandleEditUser, user}: {open: boolean, onHandleEditUser: (user: User) => void, onHandleDialogOpen: (open: boolean) => void, user: User | null}){
-    const [dialogType, _setDialogType] = useState( user? 'Edit': 'Create')
-
-    const [updateUser, {}] = useMutation(EDIT_USER)
-    const [createUser, {}] = useMutation(CREATE_USER)
+export default function UserDialog({open, onHandleDialogOpen, onHandleEditUser, user, dialogType}: {open: boolean, dialogType: 'Edit' | 'Create', onHandleEditUser: (user: User) => void, onHandleDialogOpen: (open: boolean) => void, user: User | null}){
+    const [updateUser, {}] = useMutation(EDIT_USER, {refetchQueries: [{query: GET_USERS}]})
+    const [createUser, {}] = useMutation(CREATE_USER, {refetchQueries: [{query: GET_USERS}]})
 
     const handleClose = () => {
         onHandleDialogOpen(false);
     }
 
-    const handleSubmit = () => {
-        if (user){
-            if (dialogType === 'Create') createUser({variables: {name: user.name, email: user.email}})
-            if (dialogType === 'Edit') updateUser({variables: {id: user.id, name: user.name, email: user.email}})
+    const handleSubmit = (e: BaseSyntheticEvent) => {
+        e.preventDefault();
+
+        if (!user){
+          handleClose()
+          return  
         }
-        onHandleDialogOpen(false);
+        if (dialogType === 'Create') createUser({variables: {name: user.name, email: user.email}})
+        if (dialogType === 'Edit') updateUser({variables: {id: user.id, name: user.name, email: user.email}})
+        handleClose()
     }
 
     return (
