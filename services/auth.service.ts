@@ -20,6 +20,7 @@ export async function login(email: string, password:string){
         return null;
     }
     const { token } = await response.json()
+
     localStorage.setItem(process.env.NEXT_PUBLIC_ACCESS_TOKEN_KEY!, token)
     return getUserFromToken(token)
 }

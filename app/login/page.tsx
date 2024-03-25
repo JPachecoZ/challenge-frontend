@@ -1,9 +1,11 @@
 "use client"
 
 import { FormEventHandler, useState } from "react";
-import { login } from "@/services/auth.service";
 import { useRouter } from "next/navigation";
-import { AuthProvider, useAuth } from "@/contexts/auth.context";
+import { TextField, Box, Button } from "@mui/material";
+
+import { login } from "@/services/auth.service";
+import { useAuth } from "@/libs/auth";
 
 export default function LoginPage(){
     const router = useRouter();
@@ -27,39 +29,18 @@ export default function LoginPage(){
     }
 
     return (
-            <main className="flex min-h-screen flex-col items-center justify-between p-24">
-                <form onSubmit={handleSubmit}>
-                    <div className="field">
-                        <label className="label">
-                            Email
-                        </label>
-                        <div className="control">
-                            <input className="input" type="email" required value={email} onChange={(event) => setEmail(event.target.value)} />
-                        </div>
-                    </div>
-                    <div className="field">
-                        <label className="label">
-                            Password
-                        </label>
-                        <div className="control">
-                            <input className="input" type="password" required value={password} onChange={(event) => setPassword(event.target.value)} />
-                        </div>
-                    </div>
+            <main className="flex min-h-screen flex-col items-center justify-between p-24 bg-white">
+                <Box className="flex flex-col" component="form" onSubmit={handleSubmit} sx={{'& .MuiTextField-root': {m:1, width: '25ch'}}} noValidate autoComplete="off">
+                    <TextField label="Email" value={email} onChange={(event) => setEmail(event.target.value)}/>
+                    <TextField label="Password" type="password" value={password} onChange={(event) => setPassword(event.target.value)}/>
+                    
                     {error && (
-                        <div className="message is-danger">
-                            <p className="message-body">
-                                Login-failed
-                            </p>
-                        </div>
+                        <p className="text-red-500 text-center">
+                            Login-failed
+                        </p>
                     )}
-                    <div className="field">
-                        <div className="control">
-                            <button type="submit" className="button is-link">
-                                Login
-                            </button>
-                        </div>
-                    </div>
-                </form>
+                    <Button type="submit" variant="contained">Login</Button>
+                </Box>
             </main>
     );
 }
